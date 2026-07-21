@@ -74,19 +74,7 @@ list(APPEND LIB_FILES
 
 # ── 平台相关配置 ──
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  # list(APPEND INCLUDE_DIRS
-  #   ${CMAKE_CURRENT_SOURCE_DIR}/../ffi/sdk/ffmpeg/include
-  # )
-  # file(GLOB_RECURSE FFMPEG_LIBRARIES
-  #   ${CMAKE_CURRENT_SOURCE_DIR}/../ffi/sdk/ffmpeg/lib/*.lib
-  # )
-  # list(APPEND LIB_FILES
-  #   ${FFMPEG_LIBRARIES}
-  # )
-  # file(GLOB_RECURSE  BUNDLED_FILES
-  #   ${CMAKE_CURRENT_SOURCE_DIR}/../ffi/sdk/ffmpeg/bin/*.dll
-  # )
-  # set(VCPKG_MANIFEST_MODE ON)
+
   set(VCPKG_DIR "${CMAKE_BINARY_DIR}/vcpkg")
   set(FFMPEG_VERSION_TAG "2026.06.24") # 👈 指定目标版本 8.1.2 //查看方式：在vcpkg的git查看ffmpeg包的版本对应的tag
   find_package(Git REQUIRED)
@@ -97,31 +85,18 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   endif()
   # 3. 注入 toolchain 并安装（保持 HEAD 最新状态）
   set(CMAKE_TOOLCHAIN_FILE "${VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "")
+
   execute_process(
-    COMMAND "${VCPKG_DIR}/vcpkg.exe" install "ffmpeg[core,avcodec,avformat,swresample,swscale]:x64-windows"
+    COMMAND "${VCPKG_DIR}/vcpkg.exe" install "ffmpeg[avcodec,avformat,swresample,swscale]:x64-windows-static-md"
     WORKING_DIRECTORY "${VCPKG_DIR}"
     COMMAND_ECHO STDOUT
     COMMAND_ERROR_IS_FATAL ANY
   )
-  list(APPEND CMAKE_MODULE_PATH "${VCPKG_DIR}/installed/x64-windows/share/ffmpeg")
+  list(APPEND CMAKE_MODULE_PATH "${VCPKG_DIR}/installed/x64-windows-static-md/share/ffmpeg")
+
   find_package(FFMPEG MODULE REQUIRED)
   list(APPEND INCLUDE_DIRS ${FFMPEG_INCLUDE_DIRS})
 
-  #安装dll，区分debug和release模式
-  set(_VCPKG_BASE "${VCPKG_DIR}/installed/x64-windows")
-  file(GLOB _RELEASE_DLLS "${_VCPKG_BASE}/bin/*.dll")
-  file(GLOB _DEBUG_DLLS "${_VCPKG_BASE}/debug/bin/*.dll")
-  string(REPLACE ";" "$<SEMICOLON>" _REL_STR "${_RELEASE_DLLS}")
-  string(REPLACE ";" "$<SEMICOLON>" _DBG_STR "${_DEBUG_DLLS}")
-  set(BUNDLED_FILES
-    "$<$<NOT:$<CONFIG:Debug>>:${_REL_STR}>"
-    "$<$<CONFIG:Debug>:${_DBG_STR}>"
-  )
-
-  message(STATUS "BUNDLED_FILES:${BUNDLED_FILES}")
-
-
-  # message(STATUS "FFMPEG_LIBRARIES: ${FFMPEG_LIBRARIES}")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   # Linux 配置占位
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
