@@ -1,5 +1,5 @@
 #include "audio.h"
-#include"sdl.h"
+#include"SDL.h"
 #include"models.h"
 #include<atomic>
 static enum AVSampleFormat _forceFormat = AV_SAMPLE_FMT_NONE;

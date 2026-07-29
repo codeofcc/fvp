@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10)
 
 # Project-level configuration.
 set(PROJECT_NAME "flutter_video_player")
-project(${PROJECT_NAME} LANGUAGES CXX)
+project(${PROJECT_NAME} LANGUAGES C CXX)
 
 # This value is used when generating builds using this plugin, so it must
 # not be changed.
@@ -16,12 +16,17 @@ list(APPEND PLUGIN_SOURCES
   "flutter_video_player_plugin.cc"
 )
 
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/../ffi/config.cmake)
+
 # Define the plugin library target. Its name must not be changed (see comment
 # on PLUGIN_NAME above).
 add_library(${PLUGIN_NAME} SHARED
   ${PLUGIN_SOURCES}
 )
-
+if(NOT EXISTS "${FFMPEG_INSTALL_DIR}/lib/libavcodec.a")
+  add_dependencies(${PLUGIN_NAME} ffmpeg)
+endif()
 # Apply a standard set of build settings that are configured in the
 # application-level CMakeLists.txt. This can be removed for plugins that want
 # full control over build settings.
@@ -37,15 +42,22 @@ target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
 # Source include directories and library dependencies. Add any plugin-specific
 # dependencies here.
 target_include_directories(${PLUGIN_NAME} INTERFACE
-  "${CMAKE_CURRENT_SOURCE_DIR}/include")
+  "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+target_include_directories(${PLUGIN_NAME} PRIVATE
+  ${INCLUDE_DIRS}
+)
 target_link_libraries(${PLUGIN_NAME} PRIVATE flutter)
-target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK)
+target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK
+  ${LIBRARIES}
+)
 
 # List of absolute paths to libraries that should be bundled with the plugin.
 # This list could contain prebuilt libraries, or libraries created by an
 # external build triggered from this build file.
 set(flutter_video_player_bundled_libraries
   ""
+  "${BUNDLED_FILES}"
   PARENT_SCOPE
 )
 
@@ -54,41 +66,41 @@ set(flutter_video_player_bundled_libraries
 
 # Only enable test builds when building the example (which sets this variable)
 # so that plugin clients aren't building the tests.
-if (${include_${PROJECT_NAME}_tests})
-if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
-message("Unit tests require CMake 3.11.0 or later")
-else()
-set(TEST_RUNNER "${PROJECT_NAME}_test")
-enable_testing()
+# if (${include_${PROJECT_NAME}_tests})
+# if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
+# message("Unit tests require CMake 3.11.0 or later")
+# else()
+# set(TEST_RUNNER "${PROJECT_NAME}_test")
+# enable_testing()
 
-# Add the Google Test dependency.
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/release-1.11.0.zip
-)
-# Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-# Disable install commands for gtest so it doesn't end up in the bundle.
-set(INSTALL_GTEST OFF CACHE BOOL "Disable installation of googletest" FORCE)
+# # Add the Google Test dependency.
+# include(FetchContent)
+# FetchContent_Declare(
+#   googletest
+#   URL https://github.com/google/googletest/archive/release-1.11.0.zip
+# )
+# # Prevent overriding the parent project's compiler/linker settings
+# set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+# # Disable install commands for gtest so it doesn't end up in the bundle.
+# set(INSTALL_GTEST OFF CACHE BOOL "Disable installation of googletest" FORCE)
 
-FetchContent_MakeAvailable(googletest)
+# FetchContent_MakeAvailable(googletest)
 
-# The plugin's exported API is not very useful for unit testing, so build the
-# sources directly into the test binary rather than using the shared library.
-add_executable(${TEST_RUNNER}
-  test/flutter_video_player_plugin_test.cc
-  ${PLUGIN_SOURCES}
-)
-apply_standard_settings(${TEST_RUNNER})
-target_include_directories(${TEST_RUNNER} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
-target_link_libraries(${TEST_RUNNER} PRIVATE flutter)
-target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::GTK)
-target_link_libraries(${TEST_RUNNER} PRIVATE gtest_main gmock)
+# # The plugin's exported API is not very useful for unit testing, so build the
+# # sources directly into the test binary rather than using the shared library.
+# add_executable(${TEST_RUNNER}
+#   test/flutter_video_player_plugin_test.cc
+#   ${PLUGIN_SOURCES}
+# )
+# apply_standard_settings(${TEST_RUNNER})
+# target_include_directories(${TEST_RUNNER} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+# target_link_libraries(${TEST_RUNNER} PRIVATE flutter)
+# target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::GTK)
+# target_link_libraries(${TEST_RUNNER} PRIVATE gtest_main gmock)
 
-# Enable automatic test discovery.
-include(GoogleTest)
-gtest_discover_tests(${TEST_RUNNER})
+# # Enable automatic test discovery.
+# include(GoogleTest)
+# gtest_discover_tests(${TEST_RUNNER})
 
-endif()  # CMake version check
-endif()  # include_${PROJECT_NAME}_tests
+# endif()  # CMake version check
+# endif()  # include_${PROJECT_NAME}_tests

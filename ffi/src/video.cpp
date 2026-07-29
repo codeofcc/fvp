@@ -92,8 +92,8 @@ void Video::_displayThread()
 
 void Video::_present(AVFrame* frame)
 {
-	AVRational timebase = _stream->time_base;
-	double pts = frame->pts * av_q2d(timebase);
+	// AVRational timebase = _stream->time_base;
+	// double pts = frame->pts * av_q2d(timebase);
 	AVFrame* out_frame = frame;
 	if (_pixelFormat != AV_PIX_FMT_NONE && _pixelFormat != frame->format) {
 		int w = frame->width;

@@ -1,15 +1,15 @@
 #pragma once
 #include<math.h>
 /// <summary>
-/// 时钟同步类型
+/// 时锟斤拷同锟斤拷锟斤拷锟斤拷
 /// </summary>
 typedef enum
 {
-	// 同步到音频
+	// 同锟斤拷锟斤拷锟斤拷频
 	CLOCKSYNCTYPE_AUDIO,
-	// 同步到视频
+	// 同锟斤拷锟斤拷锟斤拷频
 	CLOCKSYNCTYPE_VIDEO,
-	// 同步到绝对时钟
+	// 同锟斤拷锟斤拷锟斤拷锟斤拷时锟斤拷
 	CLOCKSYNCTYPE_ABSOLUTE
 } ClockSyncType;
 
@@ -17,11 +17,11 @@ class Clock
 {
 public:
 	bool isDisabled = false;
-	// 起始时间
+	// 锟斤拷始时锟斤拷
 	//double startTime=0;
-	// 当前pts
+	// 锟斤拷前pts
 	double startPts=NAN;
-	// 当前pts
+	// 锟斤拷前pts
 	double currentPts = NAN;
 	double getTime();
 	void updatePts(double pts);
@@ -44,10 +44,10 @@ public:
 	Clock absolute;
 private:
 	/// <summary>
-/// 音频时钟
+/// 锟斤拷频时锟斤拷
 /// </summary>
 
-	double estimateVideoDuration{ 0 };
-	double n{0};
+	// double estimateVideoDuration{ 0 };
+	// double n{0};
 };
 

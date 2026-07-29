@@ -61,7 +61,7 @@ bool Decoder::open(AVStream* stream, const std::function<void(AVFrame*)>& onFram
 
 void Decoder::close()
 {
-	AVFrame* frame;
+	// AVFrame* frame;
 	_isAlive = 0;
 	_wg.Wait();
 	AVPacket* packet;

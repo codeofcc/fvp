@@ -7,6 +7,7 @@
 #include "thread.h"
 #include <stdint.h>
 #include <signal.h>
+#include <inttypes.h>
 #if defined(_WIN32) || defined(_WIN64)
 #include <io.h>
 #include <direct.h>
@@ -22,38 +23,46 @@
 #define MKDIR(path) mkdir(path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)
 #endif
 #define MAX_PATH_LEN 1024
-static char* _logDir[1024] = { 0 }; 	// 日志文件目录，多级目录会自动创建
+static char _logDir[1024] = {0};		// 日志文件目录，多级目录会自动创建
 static int _maxSize = 1024 * 1024 * 10; // 限制每个日志文件的大小为10MB
-static int _maxBackups = 10;			   // 保留最近的10个日志文件
-static int _logLevel = 4;			   // 保留最近的10个日志文件
+static int _maxBackups = 10;			// 保留最近的10个日志文件
+static int _logLevel = 4;				// 保留最近的10个日志文件
 static int _isInit = 0;
 static Mutex _mutex;
 static Thread _thread = 0;
-static char _fileName[1024] = { 0 };
-static FILE* _file = 0;
-static char* _buffer = NULL;
+static char _fileName[1024] = {0};
+static FILE *_file = 0;
+static char *_buffer = NULL;
 static size_t _bufferSize = 0;
 static size_t _bufferCapacity = 0;
-static char* getBuffer(size_t len);
+static char *getBuffer(size_t len);
 static void returnBuffer(int len);
-static void pushToBuffer(const char* buf, size_t len);
+static void pushToBuffer(const char *buf, size_t len);
 static int flushBuffer();
-static TINT writeThread(void* userdata);
+static TINT writeThread(void *userdata);
 static time_t getSystemTimeMs(void);
-static void getIso8601Format(char* buf, size_t len, time_t time1, int ms);
-static void getTimeFileFormat(char* buf, size_t len, time_t time1, int ms);
-static time_t timeFileFormatToTimestampMs(const char* filename);
-static int createMultiLevelDir(const char* dir);
-static void cleanDirectory(const char* path);
+static void getIso8601Format(char *buf, size_t len, time_t time1, int ms);
+static void getTimeFileFormat(char *buf, size_t len, time_t time1, int ms);
+static time_t timeFileFormatToTimestampMs(const char *filename);
+static int createMultiLevelDir(const char *dir);
+static void cleanDirectory(const char *path);
 
-void LOG_CONFIG(const char* logDir, int maxSize, int maxBackups, const char* logLevel) {
-	if (strcmp(logLevel, "fatal") == 0)         _logLevel = 0;
-	else if (strcmp(logLevel, "panic") == 0)    _logLevel = 1;
-	else if (strcmp(logLevel, "dpanic") == 0) _logLevel = 2;
-	else if (strcmp(logLevel, "error") == 0)    _logLevel = 3;
-	else if (strcmp(logLevel, "warn") == 0)     _logLevel = 4;
-	else if (strcmp(logLevel, "info") == 0)     _logLevel = 5;
-	else if (strcmp(logLevel, "debug") == 0)    _logLevel = 6;
+void LOG_CONFIG(const char *logDir, int maxSize, int maxBackups, const char *logLevel)
+{
+	if (strcmp(logLevel, "fatal") == 0)
+		_logLevel = 0;
+	else if (strcmp(logLevel, "panic") == 0)
+		_logLevel = 1;
+	else if (strcmp(logLevel, "dpanic") == 0)
+		_logLevel = 2;
+	else if (strcmp(logLevel, "error") == 0)
+		_logLevel = 3;
+	else if (strcmp(logLevel, "warn") == 0)
+		_logLevel = 4;
+	else if (strcmp(logLevel, "info") == 0)
+		_logLevel = 5;
+	else if (strcmp(logLevel, "debug") == 0)
+		_logLevel = 6;
 	strcpy(_logDir, logDir);
 	_maxSize = maxSize;
 	_maxBackups = maxBackups;
@@ -64,9 +73,7 @@ void LOG_CONFIG(const char* logDir, int maxSize, int maxBackups, const char* log
 	}
 }
 
-
-
-void _log(const char* file, int line, const char* funcName, int level, const char* label, const char* log, ...)
+void _log(const char *file, int line, const char *funcName, int level, const char *label, const char *log, ...)
 {
 	char str[128];
 	size_t total_len = 0; // 用于累计字符串总长度
@@ -115,7 +122,7 @@ void _log(const char* file, int line, const char* funcName, int level, const cha
 	pushToBuffer(" ", 1);
 
 	// 9. 线程ID部分
-	sprintf(str, "%lld", (int64_t)thread_self_id());
+	sprintf(str, "%" PRId64, (int64_t)thread_self_id());
 	total_len += 1; // "<"
 	pushToBuffer("<", 1);
 
@@ -137,7 +144,7 @@ void _log(const char* file, int line, const char* funcName, int level, const cha
 	va_list valist;
 	va_start(valist, log);
 
-	char* buf = getBuffer(512);
+	char *buf = getBuffer(512);
 	int ret = vsnprintf(buf, 512, log, valist);
 
 	if (ret <= 512)
@@ -158,13 +165,15 @@ void _log(const char* file, int line, const char* funcName, int level, const cha
 	total_len += 2;
 	pushToBuffer("\r\n", 2);
 
-	if (level <= _logLevel) {
+	if (level <= _logLevel)
+	{
 		if (level <= 3)
 		{
 			flushBuffer();
 			mutex_unlock(&_mutex);
 
-			switch (level) {
+			switch (level)
+			{
 			case 0:
 				exit(1);
 				break;
@@ -187,8 +196,9 @@ void _log(const char* file, int line, const char* funcName, int level, const cha
 			}
 		}
 	}
-	else {
-		char* logStr = getBuffer(0) - total_len;
+	else
+	{
+		char *logStr = getBuffer(0) - total_len;
 		logStr[total_len] = 0;
 		printf("%s", logStr);
 		returnBuffer(total_len);
@@ -196,7 +206,7 @@ void _log(const char* file, int line, const char* funcName, int level, const cha
 
 	mutex_unlock(&_mutex);
 }
-static TINT writeThread(void* userdata)
+static TINT writeThread(void *userdata)
 {
 	int ret = 0;
 	do
@@ -214,9 +224,9 @@ static TINT writeThread(void* userdata)
 	mutex_unlock(&_mutex);
 	return 0;
 }
-static char* getBuffer(size_t len)
+static char *getBuffer(size_t len)
 {
-	char* buf;
+	char *buf;
 	size_t leftSize = _bufferCapacity - _bufferSize;
 	if (leftSize < len)
 	{
@@ -231,7 +241,7 @@ static void returnBuffer(int len)
 {
 	_bufferSize -= len;
 }
-static void pushToBuffer(const char* buf, size_t len)
+static void pushToBuffer(const char *buf, size_t len)
 {
 	memcpy(getBuffer(len), buf, len);
 }
@@ -253,7 +263,7 @@ static int flushBuffer()
 		if (_file)
 		{
 			int ret;
-			char* pBuf = _buffer;
+			char *pBuf = _buffer;
 			_buffer[_bufferSize] = 0;
 			printf("%s", _buffer);
 			do
@@ -290,30 +300,30 @@ static int flushBuffer()
 	return size;
 }
 
-static void getIso8601Format(char* buf, size_t len, time_t time1, int ms)
+static void getIso8601Format(char *buf, size_t len, time_t time1, int ms)
 {
-	struct tm* ptm = localtime(&time1);
+	struct tm *ptm = localtime(&time1);
 	snprintf(buf, len, "%04d-%02d-%02dT%02d:%02d:%02d.%03d+0800",
-		ptm->tm_year + 1900, ptm->tm_mon + 1, ptm->tm_mday,
-		ptm->tm_hour, ptm->tm_min, ptm->tm_sec, ms);
+			 ptm->tm_year + 1900, ptm->tm_mon + 1, ptm->tm_mday,
+			 ptm->tm_hour, ptm->tm_min, ptm->tm_sec, ms);
 }
 
-static void getTimeFileFormat(char* buf, size_t len, time_t time1, int ms)
+static void getTimeFileFormat(char *buf, size_t len, time_t time1, int ms)
 {
-	struct tm* ptm = localtime(&time1);
+	struct tm *ptm = localtime(&time1);
 	snprintf(buf, len, "%04d-%02d-%02dT%02d_%02d_%02d.%03d",
-		ptm->tm_year + 1900, ptm->tm_mon + 1, ptm->tm_mday,
-		ptm->tm_hour, ptm->tm_min, ptm->tm_sec, ms);
+			 ptm->tm_year + 1900, ptm->tm_mon + 1, ptm->tm_mday,
+			 ptm->tm_hour, ptm->tm_min, ptm->tm_sec, ms);
 }
 
-static int createMultiLevelDir(const char* dir)
+static int createMultiLevelDir(const char *dir)
 {
 	size_t dirPathLen = strlen(dir);
 	if (dirPathLen > MAX_PATH_LEN)
 	{
 		return -1;
 	}
-	char tmpDirPath[MAX_PATH_LEN] = { 0 };
+	char tmpDirPath[MAX_PATH_LEN] = {0};
 	for (int i = 0; i < dirPathLen; ++i)
 	{
 		tmpDirPath[i] = dir[i];
@@ -345,11 +355,11 @@ static time_t getSystemTimeMs(void)
 #endif
 }
 
-static void cleanDirectory(const char* path)
+static void cleanDirectory(const char *path)
 {
 #if defined(_WIN32) || defined(_WIN64)
 	int fileCount = 0;
-	TCHAR earlyfile[260] = { 0 };
+	TCHAR earlyfile[260] = {0};
 	time_t current_time, earliest_time = MAXINT64;
 	char pattern[1024];
 	snprintf(pattern, sizeof(pattern), "%s\\*", path);
@@ -383,14 +393,14 @@ static void cleanDirectory(const char* path)
 		DeleteFile(fileName);
 	}
 #else
-	char earlyfile[512] = { 0 };
+	char earlyfile[512] = {0};
 	time_t current_time, earliest_time = 0x7FFFFFFFFFFFFFFF;
 	int fileCount = 0;
-	DIR* dir = opendir(path);
-	int file_count = 0;
+	DIR *dir = opendir(path);
+	// int file_count = 0;
 	if (!dir)
 		return;
-	struct dirent* entry;
+	struct dirent *entry;
 	while ((entry = readdir(dir)))
 	{
 		if (strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
@@ -412,23 +422,23 @@ static void cleanDirectory(const char* path)
 	if (fileCount > _maxBackups)
 	{
 		char fileName[1024];
-		time_t time = getSystemTimeMs();
+		// time_t time = getSystemTimeMs();
 		sprintf(fileName, "%s%s", _logDir, earlyfile);
 		unlink(fileName);
 	}
 #endif
 }
 
-static time_t timeFileFormatToTimestampMs(const char* filename)
+static time_t timeFileFormatToTimestampMs(const char *filename)
 {
 	int year, month, day, hour, minute, second, milli;
 	if (sscanf(filename, "%d-%d-%dT%d_%d_%d.%d.txt",
-		&year, &month, &day,
-		&hour, &minute, &second, &milli) != 7)
+			   &year, &month, &day,
+			   &hour, &minute, &second, &milli) != 7)
 	{
 		return -1;
 	}
-	struct tm tm_time = { 0 };
+	struct tm tm_time = {0};
 	tm_time.tm_year = year - 1900;
 	tm_time.tm_mon = month - 1;
 	tm_time.tm_mday = day;

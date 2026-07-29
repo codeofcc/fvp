@@ -17,7 +17,7 @@ static double  getCurrentTime()
 }
 
 void ClockSync::reset() {
-	auto t = type;
+	// auto t = type;
 	audio = { };
 	video = {  };
 	absolute = { };
