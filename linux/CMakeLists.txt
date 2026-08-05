@@ -15,7 +15,8 @@ set(PLUGIN_NAME "flutter_video_player_plugin")
 list(APPEND PLUGIN_SOURCES
   "flutter_video_player_plugin.cc"
 )
-
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../ffi/config.cmake)
 
