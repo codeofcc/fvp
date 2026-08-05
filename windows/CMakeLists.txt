@@ -17,7 +17,7 @@ cmake_policy(VERSION 3.14...3.25)
 set(PLUGIN_NAME "flutter_video_player_plugin")
 
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/../ffi/config.cmake)
+
 
 # Any new source files that you add to the plugin should be added here.
 list(APPEND PLUGIN_SOURCES
@@ -33,6 +33,7 @@ add_library(${PLUGIN_NAME} SHARED
   ${PLUGIN_SOURCES}
 )
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../ffi/config.cmake)
 
 # Apply a standard set of build settings that are configured in the
 # application-level CMakeLists.txt. This can be removed for plugins that want
@@ -58,24 +59,18 @@ target_compile_options(${PLUGIN_NAME} PRIVATE
 
 target_include_directories(${PLUGIN_NAME} INTERFACE
   "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
 
-)
-target_include_directories(${PLUGIN_NAME} PRIVATE
-  ${INCLUDE_DIRS}
-)
 get_target_property(INCLUDE_DIRS libgo::libgo INTERFACE_INCLUDE_DIRECTORIES)
 message(STATUS "libgo include dirs: ${INCLUDE_DIRS}")
-target_link_libraries(${PLUGIN_NAME} PRIVATE flutter flutter_wrapper_plugin
-  "${LIB_FILES}"
-  ${FFMPEG_LIBRARIES}
-)
+target_link_libraries(${PLUGIN_NAME} PRIVATE flutter flutter_wrapper_plugin)
 
 
 # List of absolute paths to libraries that should be bundled with the plugin.
 # This list could contain prebuilt libraries, or libraries created by an
 # external build triggered from this build file.
 set(flutter_video_player_bundled_libraries
-  "${BUNDLED_FILES}"
+  ""
   PARENT_SCOPE
 )
 

@@ -15,19 +15,16 @@ set(PLUGIN_NAME "flutter_video_player_plugin")
 list(APPEND PLUGIN_SOURCES
   "flutter_video_player_plugin.cc"
 )
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-include(${CMAKE_CURRENT_SOURCE_DIR}/../ffi/config.cmake)
 
 # Define the plugin library target. Its name must not be changed (see comment
 # on PLUGIN_NAME above).
 add_library(${PLUGIN_NAME} SHARED
   ${PLUGIN_SOURCES}
 )
-if(NOT EXISTS "${FFMPEG_INSTALL_DIR}/lib/libavcodec.a")
-  add_dependencies(${PLUGIN_NAME} ffmpeg)
-endif()
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/../ffi/config.cmake)
+
+
 # Apply a standard set of build settings that are configured in the
 # application-level CMakeLists.txt. This can be removed for plugins that want
 # full control over build settings.
@@ -45,12 +42,9 @@ target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
 target_include_directories(${PLUGIN_NAME} INTERFACE
   "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
-target_include_directories(${PLUGIN_NAME} PRIVATE
-  ${INCLUDE_DIRS}
-)
+
 target_link_libraries(${PLUGIN_NAME} PRIVATE flutter)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK
-  ${LIBRARIES}
 )
 
 # List of absolute paths to libraries that should be bundled with the plugin.
@@ -58,7 +52,6 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK
 # external build triggered from this build file.
 set(flutter_video_player_bundled_libraries
   ""
-  "${BUNDLED_FILES}"
   PARENT_SCOPE
 )
 
