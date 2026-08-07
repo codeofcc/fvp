@@ -12,6 +12,7 @@
 # export CC=clang
 # export CXX=clang
 # export CMAKE_TOOLCHAIN_FILE="$TOOLCHAIN_FILE"  
+export CMAKE_GENERATOR=Ninja
 export PATH=$PATH:/opt/flutter-elinux/bin
 flutter-elinux pub get
 flutter-elinux build elinux \
@@ -19,9 +20,8 @@ flutter-elinux build elinux \
      --target-backend-type=gbm \
      --target-compiler-triple=aarch64-linux-gnu \
      --target-sysroot=$SYSROOT \
-     --system-include-directories=/usr/aarch64-linux-gnu/include/c++/10/aarch64-linux-gnu \
-     --target-compiler-flags=--sysroot=$SYSROOT \
      --$MODE  -v
-
+     #--target-compiler-flags=--sysroot=$SYSROOT \
+     #--system-include-directories=/usr/aarch64-linux-gnu/include/c++/10/aarch64-linux-gnu \
 #修复sysroot绝对路径软连接问题
 #python3 sysroot-relativelinks.py /home/yanfa/ubuntu21-arm64-sysroot
