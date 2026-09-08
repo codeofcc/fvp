@@ -59,10 +59,13 @@ file(GLOB_RECURSE FFI_SOURCES
   "${CMAKE_CURRENT_SOURCE_DIR}/../ffi/src/*.cpp"
 )
 
-
+# set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_library(${PLUGIN_NAME}_FFI STATIC
   ${FFI_SOURCES}
 )
+
+set_target_properties(${PLUGIN_NAME}_FFI PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 
 target_include_directories(${PLUGIN_NAME}_FFI PUBLIC
   "${CMAKE_CURRENT_SOURCE_DIR}/../ffi/include"
