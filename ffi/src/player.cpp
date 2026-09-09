@@ -13,7 +13,11 @@ struct VideoPlayer : public VideoPlayerCore
         setPixelformat(AV_PIX_FMT_RGBA);
         onDisplay = [this](Play *, DisplayEventArgs *args)
         {
-            texture->write(args->frame->data[0], args->frame->width, args->frame->height);
+            auto frame = av_frame_clone(args->frame);
+            texture->write(frame->data[0], frame->width, frame->height, [=]()
+                           { 
+                            auto pFrame=frame;
+                            av_frame_free(&pFrame); });
         };
     }
     std::unique_ptr<flutter_video_player::Texture> texture;

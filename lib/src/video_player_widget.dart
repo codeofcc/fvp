@@ -14,11 +14,18 @@ class VideoPlayerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StateDetector<Widget, VideoPlayController>(
-      onInitState: () => controller.play(),
-      onDispose: () => controller.dispose(),
+      onInitState: () {
+        controller.play();
+      },
+      onDispose: () {
+        controller.dispose();
+      },
       onDidUpdateWidget: (state) {
         if (controller != state.tag) {
           state.tag?.dispose();
+        }
+        else{
+          print("controller is same");
         }
         controller.play();
       },

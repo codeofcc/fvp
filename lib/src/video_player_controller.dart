@@ -108,8 +108,6 @@ class VideoPlayController {
   ///
   /// 停止播放并销毁播放器实例
   void dispose() {
-    if (_handle != nullptr) {
-      _ffigen.video_player_destroy(_handle);
-    }
+    _ffigen.video_player_destroy(_handle);
   }
 }
