@@ -1,8 +1,4 @@
 
-import 'flutter_video_player_platform_interface.dart';
+export 'src/video_player_controller.dart';
+export 'src/video_player_widget.dart';
 
-class FlutterVideoPlayer {
-  Future<String?> getPlatformVersion() {
-    return FlutterVideoPlayerPlatform.instance.getPlatformVersion();
-  }
-}

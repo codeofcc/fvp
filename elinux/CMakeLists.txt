@@ -6,14 +6,15 @@ project(${PROJECT_NAME} LANGUAGES C CXX)
 # not be changed
 set(PLUGIN_NAME "flutter_video_player_plugin")
 
-
+include(${CMAKE_CURRENT_SOURCE_DIR}/../ffi/config.cmake)
 
 add_library(${PLUGIN_NAME} SHARED
   "flutter_video_player_plugin.cc"
+  ${PLUGIN_SOURCES}
 )
 
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/../ffi/config.cmake)
+
 
 
 apply_standard_settings(${PLUGIN_NAME})

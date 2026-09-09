@@ -54,47 +54,43 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(video_player_core)
 
-file(GLOB_RECURSE FFI_SOURCES
+file(GLOB_RECURSE PLUGIN_SOURCES
   "${CMAKE_CURRENT_SOURCE_DIR}/../ffi/src/*.c"
   "${CMAKE_CURRENT_SOURCE_DIR}/../ffi/src/*.cpp"
 )
 
-# set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-add_library(${PLUGIN_NAME}_FFI STATIC
-  ${FFI_SOURCES}
-)
-
-set_target_properties(${PLUGIN_NAME}_FFI PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-
-target_include_directories(${PLUGIN_NAME}_FFI PUBLIC
-  "${CMAKE_CURRENT_SOURCE_DIR}/../ffi/include"
-)
-# add_dependencies(${PLUGIN_NAME}_FFI video_player_core)
-set(CMAKE_CXX_SCAN_FOR_MODULES ON) 
-# set_target_properties(video_player_core PROPERTIES CXX_SCAN_FOR_MODULES TRUE)
-set_target_properties(${PLUGIN_NAME}_FFI PROPERTIES CXX_SCAN_FOR_MODULES TRUE)
-target_link_libraries(${PLUGIN_NAME}_FFI PRIVATE video_player_core::video_player_core)
-
-# # Enable C++20 modules for the FFI library
-# target_compile_features(${PLUGIN_NAME}_FFI PRIVATE cxx_std_20)
-
-# # Add module interface path for C++20 module support
-# # This allows player.cpp to import video_player_core module
-# target_include_directories(${PLUGIN_NAME}_FFI PRIVATE
-#   "${FFI_PACKAGE_DIR}/video_player_core/include"
+# # set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+# add_library(${PLUGIN_NAME}_FFI STATIC
+#   ${FFI_SOURCES}
 # )
 
-
-# Pass the compiled module file (.pcm) to the compiler
-# The module is compiled as part of video_player_core library
-
-# target_compile_options(${PLUGIN_NAME}_FFI PRIVATE
-#   "-fmodule-file=video_player_core=${CMAKE_BINARY_DIR}/_deps/video_player_core-build/CMakeFiles/video_player_core.dir/video_player_core.pcm"
-# )
+# set_target_properties(${PLUGIN_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 
 
-target_compile_definitions(${PLUGIN_NAME}_FFI PRIVATE PLAYER_EXPORTS)
 
-target_link_libraries(${PLUGIN_NAME} PUBLIC ${PLUGIN_NAME}_FFI )
+
+
+
+
+
+
+function(my_finalizer)
+  message(STATUS "[Finalizer] 正在处理插件: ${PLUGIN_NAME}")
+  target_include_directories(${PLUGIN_NAME} PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/../ffi/include"
+  )
+
+  # add_dependencies(${PLUGIN_NAME}_FFI video_player_core)
+  set(CMAKE_CXX_SCAN_FOR_MODULES ON)
+  # set_target_properties(video_player_core PROPERTIES CXX_SCAN_FOR_MODULES TRUE)
+  set_target_properties(${PLUGIN_NAME} PROPERTIES CXX_SCAN_FOR_MODULES TRUE)
+  target_link_libraries(${PLUGIN_NAME} PRIVATE video_player_core::video_player_core)
+  target_compile_definitions(${PLUGIN_NAME} PRIVATE PLAYER_EXPORTS)
+  # 在这里执行你需要的收尾操作...
+endfunction()
+
+# 【关键】使用 EVAL CODE 包裹 DEFER，并使用 [[${var}]] 强制立即求值
+cmake_language(EVAL CODE
+  "cmake_language(DEFER CALL my_finalizer [[${PLUGIN_NAME}]])"
+)

@@ -18,6 +18,7 @@ set(PLUGIN_NAME "flutter_video_player_plugin")
 
 
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../ffi/config.cmake)
 
 # Any new source files that you add to the plugin should be added here.
 list(APPEND PLUGIN_SOURCES
@@ -33,7 +34,7 @@ add_library(${PLUGIN_NAME} SHARED
   ${PLUGIN_SOURCES}
 )
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/../ffi/config.cmake)
+
 
 # Apply a standard set of build settings that are configured in the
 # application-level CMakeLists.txt. This can be removed for plugins that want

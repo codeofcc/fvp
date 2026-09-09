@@ -15,14 +15,14 @@ set(PLUGIN_NAME "flutter_video_player_plugin")
 list(APPEND PLUGIN_SOURCES
   "flutter_video_player_plugin.cc"
 )
-
+include(${CMAKE_CURRENT_SOURCE_DIR}/../ffi/config.cmake)
 # Define the plugin library target. Its name must not be changed (see comment
 # on PLUGIN_NAME above).
 add_library(${PLUGIN_NAME} SHARED
   ${PLUGIN_SOURCES}
 )
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/../ffi/config.cmake)
+
 
 
 # Apply a standard set of build settings that are configured in the

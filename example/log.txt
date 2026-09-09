@@ -1,0 +1,1 @@
+2026-09-09T11:02:33.336+0800    ERROR   C:\Users\yanfa\Desktop\flutter_video_player\example\windows\flutter\ephemeral\.plugin_symlinks\flutter_video_player\ffi\_deps\video_player_core\src\play.cpp:62 <17964> Play::_readThread Couldn't open input stream -1414092869
