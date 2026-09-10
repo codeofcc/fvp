@@ -87,6 +87,18 @@ function(my_finalizer)
   set_target_properties(${PLUGIN_NAME} PROPERTIES CXX_SCAN_FOR_MODULES TRUE)
   target_link_libraries(${PLUGIN_NAME} PRIVATE video_player_core::video_player_core)
   target_compile_definitions(${PLUGIN_NAME} PRIVATE PLAYER_EXPORTS)
+
+  if(FLUTTER_TARGET_PLATFORM MATCHES "elinux")
+    target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLATFORM_ELINUX)
+  elseif(FLUTTER_TARGET_PLATFORM MATCHES "linux")
+    message(STATUS "FLUTTER_TARGET_PLATFORM MATCHES linux")
+    target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLATFORM_LINUX)
+  endif()
+
+
+
+
+
   # 在这里执行你需要的收尾操作...
 endfunction()
 

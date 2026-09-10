@@ -11,11 +11,13 @@ project(${PROJECT_NAME} LANGUAGES C CXX)
 # not be changed.
 set(PLUGIN_NAME "flutter_video_player_plugin")
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../ffi/config.cmake)
+
 # Any new source files that you add to the plugin should be added here.
 list(APPEND PLUGIN_SOURCES
   "flutter_video_player_plugin.cc"
 )
-include(${CMAKE_CURRENT_SOURCE_DIR}/../ffi/config.cmake)
+
 # Define the plugin library target. Its name must not be changed (see comment
 # on PLUGIN_NAME above).
 add_library(${PLUGIN_NAME} SHARED
@@ -23,13 +25,11 @@ add_library(${PLUGIN_NAME} SHARED
 )
 
 
-
-
 # Apply a standard set of build settings that are configured in the
 # application-level CMakeLists.txt. This can be removed for plugins that want
 # full control over build settings.
 apply_standard_settings(${PLUGIN_NAME})
-
+target_compile_options(${PLUGIN_NAME} PRIVATE -Wno-error)
 # Symbols are hidden by default to reduce the chance of accidental conflicts
 # between plugins. This should not be removed; any symbols that should be
 # exported should be explicitly exported with the FLUTTER_PLUGIN_EXPORT macro.

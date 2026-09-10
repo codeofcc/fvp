@@ -3,16 +3,17 @@
 #include <flutter_linux/flutter_linux.h>
 #include <gtk/gtk.h>
 #include <sys/utsname.h>
-
+#include"texture.h"
 #include <cstring>
 
 #include "flutter_video_player_plugin_private.h"
 
-#define FLUTTER_VIDEO_PLAYER_PLUGIN(obj) \
+#define FLUTTER_VIDEO_PLAYER_PLUGIN(obj)                                     \
   (G_TYPE_CHECK_INSTANCE_CAST((obj), flutter_video_player_plugin_get_type(), \
                               FlutterVideoPlayerPlugin))
 
-struct _FlutterVideoPlayerPlugin {
+struct _FlutterVideoPlayerPlugin
+{
   GObject parent_instance;
 };
 
@@ -20,22 +21,27 @@ G_DEFINE_TYPE(FlutterVideoPlayerPlugin, flutter_video_player_plugin, g_object_ge
 
 // Called when a method call is received from Flutter.
 static void flutter_video_player_plugin_handle_method_call(
-    FlutterVideoPlayerPlugin* self,
-    FlMethodCall* method_call) {
+    FlutterVideoPlayerPlugin *self,
+    FlMethodCall *method_call)
+{
   g_autoptr(FlMethodResponse) response = nullptr;
 
-  const gchar* method = fl_method_call_get_name(method_call);
+  const gchar *method = fl_method_call_get_name(method_call);
 
-  if (strcmp(method, "getPlatformVersion") == 0) {
+  if (strcmp(method, "getPlatformVersion") == 0)
+  {
     response = get_platform_version();
-  } else {
+  }
+  else
+  {
     response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
   }
 
   fl_method_call_respond(method_call, response, nullptr);
 }
 
-FlMethodResponse* get_platform_version() {
+FlMethodResponse *get_platform_version()
+{
   struct utsname uname_data = {};
   uname(&uname_data);
   g_autofree gchar *version = g_strdup_printf("Linux %s", uname_data.version);
@@ -43,24 +49,28 @@ FlMethodResponse* get_platform_version() {
   return FL_METHOD_RESPONSE(fl_method_success_response_new(result));
 }
 
-static void flutter_video_player_plugin_dispose(GObject* object) {
+static void flutter_video_player_plugin_dispose(GObject *object)
+{
   G_OBJECT_CLASS(flutter_video_player_plugin_parent_class)->dispose(object);
 }
 
-static void flutter_video_player_plugin_class_init(FlutterVideoPlayerPluginClass* klass) {
+static void flutter_video_player_plugin_class_init(FlutterVideoPlayerPluginClass *klass)
+{
   G_OBJECT_CLASS(klass)->dispose = flutter_video_player_plugin_dispose;
 }
 
-static void flutter_video_player_plugin_init(FlutterVideoPlayerPlugin* self) {}
+static void flutter_video_player_plugin_init(FlutterVideoPlayerPlugin *self) {}
 
-static void method_call_cb(FlMethodChannel* channel, FlMethodCall* method_call,
-                           gpointer user_data) {
-  FlutterVideoPlayerPlugin* plugin = FLUTTER_VIDEO_PLAYER_PLUGIN(user_data);
+static void method_call_cb(FlMethodChannel *channel, FlMethodCall *method_call,
+                           gpointer user_data)
+{
+  FlutterVideoPlayerPlugin *plugin = FLUTTER_VIDEO_PLAYER_PLUGIN(user_data);
   flutter_video_player_plugin_handle_method_call(plugin, method_call);
 }
 
-void flutter_video_player_plugin_register_with_registrar(FlPluginRegistrar* registrar) {
-  FlutterVideoPlayerPlugin* plugin = FLUTTER_VIDEO_PLAYER_PLUGIN(
+void flutter_video_player_plugin_register_with_registrar(FlPluginRegistrar *registrar)
+{
+  FlutterVideoPlayerPlugin *plugin = FLUTTER_VIDEO_PLAYER_PLUGIN(
       g_object_new(flutter_video_player_plugin_get_type(), nullptr));
 
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
@@ -72,5 +82,6 @@ void flutter_video_player_plugin_register_with_registrar(FlPluginRegistrar* regi
                                             g_object_ref(plugin),
                                             g_object_unref);
 
+  flutter_video_player::Texture::setTextureRegistrar(fl_plugin_registrar_get_texture_registrar(registrar));
   g_object_unref(plugin);
 }
