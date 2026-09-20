@@ -2,6 +2,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
+
 include(FetchContent)
 
 find_package(Git REQUIRED)
@@ -91,7 +92,6 @@ function(my_finalizer)
   if(FLUTTER_TARGET_PLATFORM MATCHES "elinux")
     target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLATFORM_ELINUX)
   elseif(FLUTTER_TARGET_PLATFORM MATCHES "linux")
-    message(STATUS "FLUTTER_TARGET_PLATFORM MATCHES linux")
     target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLATFORM_LINUX)
   endif()
 

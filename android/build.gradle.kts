@@ -35,6 +35,13 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    externalNativeBuild {
+        cmake {
+            path = file("CMakeLists.txt")
+            version = "4.3.4"
+        }
+    }
+
     sourceSets {
         getByName("main") {
             java.srcDirs("src/main/kotlin")
@@ -45,7 +52,7 @@ android {
     }
 
     defaultConfig {
-        minSdk = 24
+        minSdk = 28
     }
 
     testOptions {
