@@ -1,11 +1,11 @@
 {
-    "name": "flutter_video_player_example",
-    "short_name": "flutter_video_player_example",
+    "name": "fvp_example",
+    "short_name": "fvp_example",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "Demonstrates how to use the flutter_video_player plugin.",
+    "description": "Demonstrates how to use the fvp plugin.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

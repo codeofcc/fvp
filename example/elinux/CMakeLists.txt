@@ -1,15 +1,9 @@
 cmake_minimum_required(VERSION 3.15)
 # stop cmake from taking make from CMAKE_SYSROOT
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-
-
-
-set(CMAKE_SYSTEM_NAME "Linux")
-
-
 project(runner LANGUAGES CXX)
 
-set(BINARY_NAME "flutter_video_player_example")
+set(BINARY_NAME "fvp_example")
 
 cmake_policy(SET CMP0063 NEW)
 

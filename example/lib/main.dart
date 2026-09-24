@@ -1,9 +1,12 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
-import 'package:flutter_video_player/flutter_video_player.dart';
+import 'dart:async';
+
+import 'package:flutter/services.dart';
+import 'package:fvp/fvp.dart';
 import 'package:http/http.dart' as http;
+
+import 'dart:convert';
 
 void main() {
   runApp(const MyApp());
@@ -14,10 +17,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'IPTV Player',
-      home: const TvPlayerPage(),
-    );
+    return MaterialApp(title: 'IPTV Player', home: const TvPlayerPage());
   }
 }
 
@@ -43,7 +43,7 @@ class _TvPlayerPageState extends State<TvPlayerPage> {
     final resp = await http.get(
       Uri.parse('https://live.zbds.top/tv/iptv4.m3u'),
       headers: {
-        'Accept-Encoding': 'identity',  // 禁用压缩，避免乱码
+        'Accept-Encoding': 'identity', // 禁用压缩，避免乱码
       },
     );
     if (resp.statusCode == 200) {
@@ -86,12 +86,9 @@ class _TvPlayerPageState extends State<TvPlayerPage> {
       } else if (!trimmed.startsWith('#')) {
         url = trimmed;
         if (name != null && url != null) {
-          channels.add(TvChannel(
-            name: name,
-            url: url,
-            logo: logo,
-            group: group ?? '未分类',
-          ));
+          channels.add(
+            TvChannel(name: name, url: url, logo: logo, group: group ?? '未分类'),
+          );
           name = null;
           logo = null;
           group = null;
@@ -124,16 +121,15 @@ class _TvPlayerPageState extends State<TvPlayerPage> {
           : Row(
               children: [
                 // 左侧频道列表
-                SizedBox(
-                  width: 200,
-                  child: _buildChannelList(),
-                ),
+                SizedBox(width: 200, child: _buildChannelList()),
                 // 右侧播放器
                 Expanded(
                   child: _selectedChannel == null
                       ? const Center(child: Text('请选择频道'))
                       : VideoPlayerWidget(
-                          controller: VideoPlayController(_selectedChannel!.url),
+                          controller: VideoPlayController(
+                            _selectedChannel!.url,
+                          ),
                         ),
                 ),
               ],
@@ -156,12 +152,20 @@ class _TvPlayerPageState extends State<TvPlayerPage> {
             final selected = _selectedChannel == ch;
             return ListTile(
               leading: ch.logo != null
-                  ? Image.network(ch.logo!, width: 30, height: 30, errorBuilder: (_, __, ___) => const Icon(Icons.tv))
+                  ? Image.network(
+                      ch.logo!,
+                      width: 30,
+                      height: 30,
+                      errorBuilder: (_, __, ___) => const Icon(Icons.tv),
+                    )
                   : const Icon(Icons.tv),
-              title: Text(ch.name, style: TextStyle(
-                color: selected ? Colors.blue : null,
-                fontWeight: selected ? FontWeight.bold : null,
-              )),
+              title: Text(
+                ch.name,
+                style: TextStyle(
+                  color: selected ? Colors.blue : null,
+                  fontWeight: selected ? FontWeight.bold : null,
+                ),
+              ),
               selected: selected,
               onTap: () => setState(() => _selectedChannel = ch),
             );

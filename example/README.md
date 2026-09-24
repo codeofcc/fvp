@@ -1,6 +1,6 @@
-# flutter_video_player_example
+# fvp_example
 
-Demonstrates how to use the flutter_video_player plugin.
+Demonstrates how to use the fvp plugin.
 
 ## Getting Started
 

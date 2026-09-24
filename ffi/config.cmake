@@ -43,17 +43,17 @@ set(FFI_PACKAGE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../ffi/_deps")
 
 
 git_clone_if_needed(
-  "https://github.com/codeofcc/video_player_core"
+  "https://github.com/codeofcc/vpc"
   "main"
-  "${FFI_PACKAGE_DIR}/video_player_core"
+  "${FFI_PACKAGE_DIR}/vpc"
 )
 
 
 FetchContent_Declare(
-  video_player_core
-  SOURCE_DIR "${FFI_PACKAGE_DIR}/video_player_core"
+  vpc
+  SOURCE_DIR "${FFI_PACKAGE_DIR}/vpc"
 )
-FetchContent_MakeAvailable(video_player_core)
+FetchContent_MakeAvailable(vpc)
 
 file(GLOB_RECURSE PLUGIN_SOURCES
   "${CMAKE_CURRENT_SOURCE_DIR}/../ffi/src/*.c"
@@ -77,16 +77,17 @@ file(GLOB_RECURSE PLUGIN_SOURCES
 
 
 function(my_finalizer)
-  message(STATUS "[Finalizer] 正在处理插件: ${PLUGIN_NAME}")
-  target_include_directories(${PLUGIN_NAME} PUBLIC
+  message(STATUS "[Finalizer] 正在处理插件: ${PLUGIN_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/../ffi/include")
+  target_include_directories(${PLUGIN_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/../ffi/include"
   )
+
 
   # add_dependencies(${PLUGIN_NAME}_FFI video_player_core)
   set(CMAKE_CXX_SCAN_FOR_MODULES ON)
   # set_target_properties(video_player_core PROPERTIES CXX_SCAN_FOR_MODULES TRUE)
   set_target_properties(${PLUGIN_NAME} PROPERTIES CXX_SCAN_FOR_MODULES TRUE)
-  target_link_libraries(${PLUGIN_NAME} PRIVATE video_player_core::video_player_core)
+  target_link_libraries(${PLUGIN_NAME} PRIVATE vpc::vpc)
   target_compile_definitions(${PLUGIN_NAME} PRIVATE PLAYER_EXPORTS)
 
   if(FLUTTER_TARGET_PLATFORM MATCHES "elinux")
@@ -96,6 +97,18 @@ function(my_finalizer)
   endif()
 
 
+  target_compile_options(${PLUGIN_NAME} PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/W0> # Windows: 关闭所有警告
+    $<$<CXX_COMPILER_ID:GNU>:-w> # Linux/GCC: 关闭所有警告
+    $<$<CXX_COMPILER_ID:Clang>:-w> # Mac/Clang: 关闭所有警告
+  )
+
+
+  # if(MSVC)
+  #   target_compile_options(${PLUGIN_NAME} PRIVATE /UFLUTTER_PLUGIN_IMPL)
+  # else()
+  #   # target_compile_options(${PLUGIN_NAME} PRIVATE -UFLUTTER_PLUGIN_IMPL)
+  # endif()
 
 
 

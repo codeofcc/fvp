@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.10)
 # message(STATUS "ANDROID_NATIVE_API_LEVEL = ${ANDROID_NATIVE_API_LEVEL}")
 
 
-set(PLUGIN_NAME "flutter_video_player_plugin")
+set(PLUGIN_NAME "fvp_plugin")
 
 
 

@@ -4,18 +4,16 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Project-level configuration.
-set(PROJECT_NAME "flutter_video_player")
+set(PROJECT_NAME "fvp")
 project(${PROJECT_NAME} LANGUAGES C CXX)
 
 # This value is used when generating builds using this plugin, so it must
 # not be changed.
-set(PLUGIN_NAME "flutter_video_player_plugin")
-
+set(PLUGIN_NAME "fvp_plugin")
 include(${CMAKE_CURRENT_SOURCE_DIR}/../ffi/config.cmake)
-
 # Any new source files that you add to the plugin should be added here.
 list(APPEND PLUGIN_SOURCES
-  "flutter_video_player_plugin.cc"
+  "fvp_plugin.cc"
 )
 
 # Define the plugin library target. Its name must not be changed (see comment
@@ -24,12 +22,11 @@ add_library(${PLUGIN_NAME} SHARED
   ${PLUGIN_SOURCES}
 )
 
-
 # Apply a standard set of build settings that are configured in the
 # application-level CMakeLists.txt. This can be removed for plugins that want
 # full control over build settings.
 apply_standard_settings(${PLUGIN_NAME})
-target_compile_options(${PLUGIN_NAME} PRIVATE -Wno-error)
+
 # Symbols are hidden by default to reduce the chance of accidental conflicts
 # between plugins. This should not be removed; any symbols that should be
 # exported should be explicitly exported with the FLUTTER_PLUGIN_EXPORT macro.
@@ -40,26 +37,23 @@ target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
 # Source include directories and library dependencies. Add any plugin-specific
 # dependencies here.
 target_include_directories(${PLUGIN_NAME} INTERFACE
-  "${CMAKE_CURRENT_SOURCE_DIR}/include"
-)
-
+  "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(${PLUGIN_NAME} PRIVATE flutter)
-target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK
-)
+target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK)
 
 # List of absolute paths to libraries that should be bundled with the plugin.
 # This list could contain prebuilt libraries, or libraries created by an
 # external build triggered from this build file.
-set(flutter_video_player_bundled_libraries
+set(fvp_bundled_libraries
   ""
   PARENT_SCOPE
 )
 
-# === Tests ===
-# These unit tests can be run from a terminal after building the example.
+# # === Tests ===
+# # These unit tests can be run from a terminal after building the example.
 
-# Only enable test builds when building the example (which sets this variable)
-# so that plugin clients aren't building the tests.
+# # Only enable test builds when building the example (which sets this variable)
+# # so that plugin clients aren't building the tests.
 # if (${include_${PROJECT_NAME}_tests})
 # if(${CMAKE_VERSION} VERSION_LESS "3.11.0")
 # message("Unit tests require CMake 3.11.0 or later")
@@ -83,7 +77,7 @@ set(flutter_video_player_bundled_libraries
 # # The plugin's exported API is not very useful for unit testing, so build the
 # # sources directly into the test binary rather than using the shared library.
 # add_executable(${TEST_RUNNER}
-#   test/flutter_video_player_plugin_test.cc
+#   test/fvp_plugin_test.cc
 #   ${PLUGIN_SOURCES}
 # )
 # apply_standard_settings(${TEST_RUNNER})

@@ -1,11 +1,11 @@
-name: flutter_video_player_example
-description: "Demonstrates how to use the flutter_video_player plugin."
+name: fvp_example
+description: "Demonstrates how to use the fvp plugin."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 environment:
-  sdk: ^3.12.2
+  sdk: ^3.13.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -16,12 +16,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
   http: ^1.2.0
-
-  flutter_video_player:
+  fvp:
     # When depending on this package from a real application you should use:
-    #   flutter_video_player: ^x.y.z
+    #   fvp: ^x.y.z
     # See https://dart.dev/tools/pub/dependencies#version-constraints
     # The example app is bundled with the plugin so we use a path dependency on
     # the parent directory to use the current plugin's version.
