@@ -1,6 +1,6 @@
 # fvp
 
-A new Flutter plugin project.
+A  Flutter video player plugin project.
 
 ## Getting Started
 
